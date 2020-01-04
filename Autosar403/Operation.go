@@ -4,9 +4,15 @@ package Autosar403
 import (
 	"encoding/xml"
 	"io/ioutil"
+
+	"github.com/MCU-LaoDai/ArxmlMaster"
 )
 
-type Autosar AUTOSAR
+type Autosar struct {
+	Ar        AUTOSAR
+	NameIndex map[string]interface{}
+	Packages  []AR_PACKAGE
+}
 
 func NewAutosar(arxmlFile string) (Autosar, error) {
 	var ar Autosar
@@ -16,10 +22,14 @@ func NewAutosar(arxmlFile string) (Autosar, error) {
 		return ar, err
 	}
 
-	err = xml.Unmarshal(bytes, &ar)
+	err = xml.Unmarshal(bytes, &ar.Ar)
 	if err != nil {
 		panic(err)
 	}
+
+	ar.NameIndex = make(map[string]interface{})
+	ArxmlMaster.NameIndexCreate(ar.Ar, "", ar.NameIndex)
+	ar.FindPackages()
 
 	return ar, err
 }
@@ -36,13 +46,8 @@ func (ar *Autosar) Pack(outPath string) error {
 	return err
 }
 
-func (ar *Autosar) FindPackages() []AR_PACKAGE {
-	var packages []AR_PACKAGE
-
-	if ar.ArPackages != nil {
-		packages = findPackages(packages, ar.ArPackages.ArPackage)
-	}
-	return packages
+func (ar *Autosar) FindPackages() {
+	ar.Packages = findPackages(ar.Packages, ar.Ar.ArPackages.ArPackage)
 }
 
 func findPackages(target []AR_PACKAGE, source []AR_PACKAGE) []AR_PACKAGE {
@@ -54,6 +59,5 @@ func findPackages(target []AR_PACKAGE, source []AR_PACKAGE) []AR_PACKAGE {
 			}
 		}
 	}
-
 	return target
 }

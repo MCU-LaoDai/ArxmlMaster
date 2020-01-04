@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
+	// parse arxml to mapping structure
 	ar, err := Autosar403.NewAutosar("example.arxml")
 	fmt.Println(err)
-	packages := ar.FindPackages()
-	fmt.Println(len(packages))
-	for _, p := range packages {
-		fmt.Println(p.ShortName.Text)
-	}
+	// get packages in arxml
+	fmt.Println(ar.Packages)
+	// get name index dictionary
+	fmt.Println(ar.NameIndex)
 }
