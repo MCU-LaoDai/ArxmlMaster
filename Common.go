@@ -32,12 +32,14 @@ func NameIndexCreate(node interface{}, nameParent string,
 		value = value.Elem()
 	}
 
-	if typ.Kind() == reflect.Slice {
+	switch typ.Kind() {
+	case reflect.Slice:
 		sliceNum := value.Len()
 		for i := 0; i < sliceNum; i++ {
 			NameIndexCreate(value.Index(i).Interface(), nameParent, nameIndex)
 		}
-	} else if typ.Kind() == reflect.Struct {
+
+	case reflect.Struct:
 		fieldNum := typ.NumField()
 
 		for i := 0; i < fieldNum; i++ {
@@ -52,5 +54,8 @@ func NameIndexCreate(node interface{}, nameParent string,
 		for i := 0; i < fieldNum; i++ {
 			NameIndexCreate(value.Field(i).Interface(), nameParent, nameIndex)
 		}
+
+	default:
+
 	}
 }
